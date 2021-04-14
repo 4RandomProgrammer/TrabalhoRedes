@@ -29,15 +29,29 @@ public class App {
 
         if(conexao == 1){
             //cliente
-            System.out.println("Digite o ip do host:");
-            ip = entrada.nextLine();
-            servidor = new Socket(ip, 7777);
+            do {
+                System.out.println("Digite o ip do host:");
+                ip = entrada.nextLine();
+                try {
+                    servidor = new Socket(ip, 7777);
+                } catch (UnknownHostException e) {
+                    System.out.println("O Ip digitado nao foi encontrado, digite novamente.");
+                } 
+            } while (servidor == null);
             System.out.println("Cliente eviando para " + ip + ":77777");
         } else {
             //host
             localServer = new ServerSocket(7777);
-            servidor = localServer.accept();
-            System.out.println("Conectado com: " + servidor.getInetAddress().getHostAddress());//notifica caso haja conexao
+            localServer.setSoTimeout(5000);
+            do {
+                try {
+                    servidor = localServer.accept();
+                } catch (SocketTimeoutException e) {
+                    System.out.println("Tempo de conexao esgotado, para esperar novamente digite alguma tecla.");
+                }
+            } while (servidor == null);
+            //notifica caso haja conexao
+            System.out.println("Conectado com: " + servidor.getInetAddress().getHostAddress());
 
         }
 
@@ -103,13 +117,15 @@ public class App {
         @Override
         public void run(){
 
-            InputStream in = null;
+            InputStream in;
             
             try {
                 in = servidor.getInputStream();
             } catch (IOException e1) {
                 e1.printStackTrace();
+                return;
             }
+            
             while (true) {
                 try {
                     //estabelece a stream in para receber dados
