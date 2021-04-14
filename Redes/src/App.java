@@ -21,6 +21,9 @@ public class App {
         Socket servidor = null;
         ServerSocket localServer;
 
+        System.out.println("Qual seu Nome?");
+        String nome = entrada.nextLine();
+
         System.out.println("Vc deseja conectar ou hostear a conexão?");
         System.out.println("1 - para se conectar");
         System.err.println("2 - para ser host");
@@ -42,7 +45,7 @@ public class App {
         } else {
             //host
             localServer = new ServerSocket(7777);
-            localServer.setSoTimeout(5000);
+            localServer.setSoTimeout(50000);
             do {
                 try {
                     System.out.println("Tentando aceitar conexao...");
@@ -58,13 +61,14 @@ public class App {
         }
 
 
-        Runnable r2 = new EnviarData(servidor);
+        Runnable r2 = new EnviarData(servidor, entrada, nome);
         new Thread(r2).start();
 
         Runnable r3 = new ReceberData(servidor);
         new Thread(r3).start();
 
-        entrada.close();
+        
+        //entrada.close();
 
     }
     
@@ -72,9 +76,13 @@ public class App {
 
 
         Socket servidor;
+        Scanner entrada;
+        String nome;
 
-        public EnviarData(Socket servidor) {
+        public EnviarData(Socket servidor, Scanner entrada, String nome) {
             this.servidor = servidor;
+            this.entrada = entrada;
+            this.nome = nome;
         }
         
         @Override
@@ -86,14 +94,16 @@ public class App {
                 e1.printStackTrace();
                 return;
             }
-            while (true) {
+            System.out.println("Escreva uma mensagem :D");
+            do {
+                // Le a proxima linha do teclado no formato char int int
+                String str_mensagem = entrada.nextLine();
                 try {
-                    // Le a proxima linha do teclado no formato char int int
-                    System.out.println("Escreva uma mensagem :D");
                     //ESPERA DA UI O INPUT EM STRING string
-                    String string = new String("Carlos");
-        
-                    char mensagem[] = string.toCharArray();
+                    if (str_mensagem.equalsIgnoreCase("sai bosta")) {
+                        break;
+                    }
+                    char mensagem[] = new String(nome+": "+str_mensagem).toCharArray();
                     for (int i = 0; i < mensagem.length; i++) {
                         saida.write(mensagem[i]);        
                     }
@@ -103,7 +113,8 @@ public class App {
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
-            }
+            } while (true);
+            entrada.close();
         }
     };
     
