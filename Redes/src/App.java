@@ -25,9 +25,9 @@ public class App {
         System.out.println("1 - para se conectar");
         System.err.println("2 - para ser host");
 
-        int conexao = entrada.nextInt();
+        String conexao = entrada.nextLine();
 
-        if(conexao == 1){
+        if(conexao.equalsIgnoreCase("1")){
             //cliente
             do {
                 System.out.println("Digite o ip do host:");
@@ -45,9 +45,11 @@ public class App {
             localServer.setSoTimeout(5000);
             do {
                 try {
+                    System.out.println("Tentando aceitar conexao...");
                     servidor = localServer.accept();
                 } catch (SocketTimeoutException e) {
                     System.out.println("Tempo de conexao esgotado, para esperar novamente digite alguma tecla.");
+                    entrada.nextLine();
                 }
             } while (servidor == null);
             //notifica caso haja conexao
@@ -125,7 +127,7 @@ public class App {
                 e1.printStackTrace();
                 return;
             }
-            
+
             while (true) {
                 try {
                     //estabelece a stream in para receber dados
