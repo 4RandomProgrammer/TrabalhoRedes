@@ -7,7 +7,6 @@
 
 import java.io.*;
 import java.net.*;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
@@ -30,9 +29,10 @@ public class App {
 
         if(conexao == 1){
             //cliente
+            System.out.println("Digite o ip do host:");
             ip = entrada.nextLine();
             servidor = new Socket(ip, 7777);
-            System.out.println("Cliente eviando para porta 77777");
+            System.out.println("Cliente eviando para " + ip + ":77777");
         } else {
             //host
             localServer = new ServerSocket(7777);
@@ -63,7 +63,13 @@ public class App {
         
         @Override
         public void run(){
-            OutputStream saida = servidor.getOutputStream();
+            OutputStream saida;
+            try {
+                saida = servidor.getOutputStream();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return;
+            }
             while (true) {
                 try {
                     // Le a proxima linha do teclado no formato char int int
@@ -71,9 +77,10 @@ public class App {
                     //ESPERA DA UI O INPUT EM STRING string
                     String string = new String("Carlos");
         
-                    // Cria a Stream de saida para o servidor, escreve um Byte com a operacao
-                    // e dois Ints com os operandos
-                    saida.write(b);
+                    char mensagem[] = string.toCharArray();
+                    for (int i = 0; i < mensagem.length; i++) {
+                        saida.write(mensagem[i]);        
+                    }
                     // Flush para enviar.
                     saida.flush();   
                     
@@ -118,6 +125,7 @@ public class App {
     
                     //convertendo mensagem para string
                     String s = new String(msg, StandardCharsets.UTF_8);
+                    System.out.println(s);
     
                     //enviar para interface
                 } catch (Exception e) {
